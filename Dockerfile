@@ -7,7 +7,7 @@ FROM ubuntu:24.04
 # Metadata
 LABEL maintainer="xentropics"
 LABEL description="Cronicle scheduler - hardened and rootless"
-LABEL version="1.1"
+LABEL version="1.1.1"
 
 # Build arguments for enhanced security
 ARG DEBIAN_FRONTEND=noninteractive
