@@ -73,7 +73,7 @@ metadata:
 type: Opaque
 stringData:
   username: "admin"
-  password: ""  # Leave empty for auto-generated password
+  password: "" # Leave empty for auto-generated password
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -98,105 +98,105 @@ spec:
         fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
-      
+
       containers:
-      - name: cronicle
-        image: xentropics/cronicle:latest
-        imagePullPolicy: Always
-        
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          capabilities:
-            drop:
-              - ALL
-        
-        ports:
-        - name: http
-          containerPort: 3012
-          protocol: TCP
-        
-        envFrom:
-        - configMapRef:
-            name: cronicle-config
-        
-        env:
-        - name: CRONICLE_ADMIN_USER
-          valueFrom:
-            secretKeyRef:
-              name: cronicle-admin
-              key: username
-        - name: CRONICLE_ADMIN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: cronicle-admin
-              key: password
-        
-        volumeMounts:
-        - name: data
-          mountPath: /opt/cronicle/data
-        - name: logs
-          mountPath: /opt/cronicle/logs
-        - name: conf
-          mountPath: /opt/cronicle/conf
-        - name: queue
-          mountPath: /opt/cronicle/queue
-        - name: tmp
-          mountPath: /tmp
-        - name: cronicle-tmp
-          mountPath: /opt/cronicle/tmp
-        - name: var-tmp
-          mountPath: /var/tmp
-        
-        resources:
-          limits:
-            memory: "2Gi"
-            cpu: "2000m"
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-        
-        livenessProbe:
-          httpGet:
-            path: /
-            port: http
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          timeoutSeconds: 10
-          failureThreshold: 3
-        
-        readinessProbe:
-          httpGet:
-            path: /
-            port: http
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-      
+        - name: cronicle
+          image: xentropics/cronicle:latest
+          imagePullPolicy: Always
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+
+          ports:
+            - name: http
+              containerPort: 3012
+              protocol: TCP
+
+          envFrom:
+            - configMapRef:
+                name: cronicle-config
+
+          env:
+            - name: CRONICLE_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cronicle-admin
+                  key: username
+            - name: CRONICLE_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cronicle-admin
+                  key: password
+
+          volumeMounts:
+            - name: data
+              mountPath: /opt/cronicle/data
+            - name: logs
+              mountPath: /opt/cronicle/logs
+            - name: conf
+              mountPath: /opt/cronicle/conf
+            - name: queue
+              mountPath: /opt/cronicle/queue
+            - name: tmp
+              mountPath: /tmp
+            - name: cronicle-tmp
+              mountPath: /opt/cronicle/tmp
+            - name: var-tmp
+              mountPath: /var/tmp
+
+          resources:
+            limits:
+              memory: "2Gi"
+              cpu: "2000m"
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
       volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: cronicle-data
-      - name: logs
-        persistentVolumeClaim:
-          claimName: cronicle-logs
-      - name: conf
-        persistentVolumeClaim:
-          claimName: cronicle-conf
-      - name: queue
-        persistentVolumeClaim:
-          claimName: cronicle-queue
-      - name: tmp
-        emptyDir:
-          sizeLimit: 100Mi
-      - name: cronicle-tmp
-        emptyDir:
-          sizeLimit: 100Mi
-      - name: var-tmp
-        emptyDir:
-          sizeLimit: 50Mi
+        - name: data
+          persistentVolumeClaim:
+            claimName: cronicle-data
+        - name: logs
+          persistentVolumeClaim:
+            claimName: cronicle-logs
+        - name: conf
+          persistentVolumeClaim:
+            claimName: cronicle-conf
+        - name: queue
+          persistentVolumeClaim:
+            claimName: cronicle-queue
+        - name: tmp
+          emptyDir:
+            sizeLimit: 100Mi
+        - name: cronicle-tmp
+          emptyDir:
+            sizeLimit: 100Mi
+        - name: var-tmp
+          emptyDir:
+            sizeLimit: 50Mi
 ---
 apiVersion: v1
 kind: Service
@@ -208,10 +208,10 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 3012
-    targetPort: http
-    protocol: TCP
-    name: http
+    - port: 3012
+      targetPort: http
+      protocol: TCP
+      name: http
   selector:
     app: cronicle
 ---
@@ -225,13 +225,13 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: cronicle.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: cronicle
-            port:
-              name: http
+    - host: cronicle.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cronicle
+                port:
+                  name: http
