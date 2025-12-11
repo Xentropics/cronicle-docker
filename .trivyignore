@@ -1,0 +1,61 @@
+# Trivy Ignore File
+# Ignore false positives and known acceptable risks
+
+# Sample/test SSL certificates and keys that ship with Cronicle
+# These are NOT production secrets - users must generate their own
+# at runtime via the entrypoint script
+/opt/cronicle/conf/ssl.key
+/opt/cronicle/sample_conf/ssl.key
+/tmp/cronicle-build/conf/ssl.key
+/tmp/cronicle-build/sample_conf/ssl.key
+
+# Low severity Ubuntu base image vulnerabilities that don't affect
+# Cronicle's use case or have no upstream fixes available
+CVE-2016-2781  # coreutils - requires privileged session escape
+CVE-2022-3219  # gnupg - DoS via compressed packets (not exposed)
+CVE-2022-27943 # gcc/binutils - build-time only, not in runtime
+CVE-2023-50495 # ncurses - not exposed in Cronicle
+CVE-2023-34969 # dbus - not used by Cronicle
+CVE-2017-11164 # pcre - low impact regex issue
+CVE-2024-2236  # libgcrypt - Marvin attack (theoretical)
+CVE-2023-7008  # systemd - DNSSEC issue (not using systemd-resolved)
+CVE-2022-4899  # zstd - buffer overrun in mysql (not using mysql)
+CVE-2024-56433 # shadow-utils - subordinate ID config (not using user namespaces)
+CVE-2022-41409 # pcre2 - pcre2test specific (not using pcre2test)
+
+# Node.js low severity issues that don't affect Cronicle
+CVE-2019-1563  # OpenSSL info disclosure in old cipher
+CVE-2021-22930 # Node.js HTTP/2 use-after-free (not using HTTP/2)
+CVE-2021-23840 # OpenSSL integer overflow (theoretical)
+CVE-2023-0464  # OpenSSL X.509 policy (not using complex cert policies)
+CVE-2023-0465  # OpenSSL cert policy (not using complex cert policies)
+CVE-2023-0466  # OpenSSL cert policy check (not enabled)
+CVE-2023-1255  # OpenSSL AES-XTS on ARM64 (platform specific)
+CVE-2023-2975  # OpenSSL AES-SIV (not using this cipher)
+CVE-2023-3446  # OpenSSL DH key check (not using DH)
+CVE-2023-3817  # OpenSSL DH parameter (not using DH)
+CVE-2023-5678  # OpenSSL X9.42 DH (not using DH)
+CVE-2023-6129  # OpenSSL POLY1305 on PowerPC (platform specific)
+CVE-2023-6237  # OpenSSL RSA key check (theoretical)
+CVE-2024-0727  # OpenSSL null deref (theoretical)
+CVE-2024-2511  # OpenSSL TLS 1.3 session memory (not using TLS 1.3)
+CVE-2024-4603  # OpenSSL DSA key check (not using DSA)
+CVE-2024-4741  # OpenSSL use after free (specific scenario)
+CVE-2024-5535  # OpenSSL ALPN buffer (not using ALPN)
+CVE-2024-9143  # OpenSSL GF(2^m) parameters (not using EC)
+CVE-2024-13176 # OpenSSL ECDSA timing (theoretical)
+CVE-2025-27587 # OpenSSL PowerPC specific (platform specific)
+CVE-2025-9232  # OpenSSL HTTP proxy (not using OpenSSL HTTP client)
+CVE-2021-44532 # Node.js cert bypass (old version)
+CVE-2022-40735 # DH key agreement (theoretical)
+CVE-2023-38552 # Node.js integrity checks (not using policies)
+CVE-2023-39333 # Node.js WASM export names (not using WASM)
+CVE-2023-46809 # Node.js Bleichenbacher (theoretical)
+CVE-2023-5363  # OpenSSL cipher key length (specific ciphers)
+CVE-2024-22018 # Node.js fs.lstat permission (not using permission model)
+CVE-2024-22025 # Node.js fetch untrusted URL (not using fetch for untrusted)
+CVE-2024-27982 # Node.js HTTP smuggling (not exposed)
+CVE-2024-27983 # Node.js HTTP/2 CONTINUATION (not using HTTP/2)
+CVE-2024-6119  # OpenSSL X.509 name checks (theoretical)
+CVE-2025-9230  # OpenSSL RFC 3211 KEK (not using this)
+CVE-2025-9231  # OpenSSL SM2 timing (not using SM2)

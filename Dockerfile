@@ -2,12 +2,12 @@
 # Hardened, rootless Docker image based on Ubuntu LTS
 
 # Use Ubuntu LTS as base image
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # Metadata
 LABEL maintainer="xentropics"
 LABEL description="Cronicle scheduler - hardened and rootless"
-LABEL version="1.0"
+LABEL version="1.1"
 
 # Build arguments for enhanced security
 ARG DEBIAN_FRONTEND=noninteractive
@@ -50,14 +50,14 @@ APT::Periodic::Unattended-Upgrade "1";\n' \
     > /etc/apt/apt.conf.d/20auto-upgrades
 
 # Install Node.js (required for Cronicle) with signature verification
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y --no-install-recommends nodejs && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apt/archives/*
 
 # Create non-root user for running Cronicle with restricted permissions
-RUN groupadd -r -g 1000 cronicle && \
-    useradd -r -u 1000 -g cronicle -m -d /opt/cronicle -s /sbin/nologin cronicle && \
+RUN groupadd -r -g 3012 cronicle && \
+    useradd -r -u 3012 -g cronicle -m -d /opt/cronicle -s /sbin/nologin cronicle && \
     passwd -l cronicle
 
 # Security hardening - remove unnecessary packages and services
@@ -74,6 +74,7 @@ USER cronicle
 WORKDIR /tmp/cronicle-build
 RUN git clone https://github.com/jhuckaby/Cronicle.git . && \
     npm install && \
+    npm update glob nodemailer && \
     node bin/build.js dist
 
 # Move to final location as root
