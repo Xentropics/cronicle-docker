@@ -1,0 +1,57 @@
+# Environment files (contain secrets)
+.env
+.env.local
+.env.*.local
+
+# Data directories
+data/
+logs/
+
+# Backups
+backups/
+*.tar.gz
+*.tar
+*.zip
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS files
+Thumbs.db
+desktop.ini
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.log
+
+# Docker volumes (if using local bind mounts)
+volumes/
+
+# Node modules (if any)
+node_modules/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Documentation build
+docs/_build/

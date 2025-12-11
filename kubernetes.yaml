@@ -1,0 +1,237 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cronicle
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cronicle-data
+  namespace: cronicle
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cronicle-logs
+  namespace: cronicle
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cronicle-conf
+  namespace: cronicle
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cronicle-queue
+  namespace: cronicle
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cronicle-config
+  namespace: cronicle
+data:
+  CRONICLE_base_app_url: "http://cronicle.local:3012"
+  CRONICLE_server_hostname: "cronicle-server"
+  CRONICLE_web_http_port: "3012"
+  CRONICLE_secret_key: "CHANGE_THIS_TO_A_RANDOM_SECURE_STRING"
+  CRONICLE_timezone: "America/New_York"
+  CRONICLE_storage_engine: "Filesystem"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cronicle-admin
+  namespace: cronicle
+type: Opaque
+stringData:
+  username: "admin"
+  password: ""  # Leave empty for auto-generated password
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cronicle
+  namespace: cronicle
+  labels:
+    app: cronicle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cronicle
+  template:
+    metadata:
+      labels:
+        app: cronicle
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      
+      containers:
+      - name: cronicle
+        image: xentropics/cronicle:latest
+        imagePullPolicy: Always
+        
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+            drop:
+              - ALL
+        
+        ports:
+        - name: http
+          containerPort: 3012
+          protocol: TCP
+        
+        envFrom:
+        - configMapRef:
+            name: cronicle-config
+        
+        env:
+        - name: CRONICLE_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: cronicle-admin
+              key: username
+        - name: CRONICLE_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cronicle-admin
+              key: password
+        
+        volumeMounts:
+        - name: data
+          mountPath: /opt/cronicle/data
+        - name: logs
+          mountPath: /opt/cronicle/logs
+        - name: conf
+          mountPath: /opt/cronicle/conf
+        - name: queue
+          mountPath: /opt/cronicle/queue
+        - name: tmp
+          mountPath: /tmp
+        - name: cronicle-tmp
+          mountPath: /opt/cronicle/tmp
+        - name: var-tmp
+          mountPath: /var/tmp
+        
+        resources:
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+        
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: cronicle-data
+      - name: logs
+        persistentVolumeClaim:
+          claimName: cronicle-logs
+      - name: conf
+        persistentVolumeClaim:
+          claimName: cronicle-conf
+      - name: queue
+        persistentVolumeClaim:
+          claimName: cronicle-queue
+      - name: tmp
+        emptyDir:
+          sizeLimit: 100Mi
+      - name: cronicle-tmp
+        emptyDir:
+          sizeLimit: 100Mi
+      - name: var-tmp
+        emptyDir:
+          sizeLimit: 50Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cronicle
+  namespace: cronicle
+  labels:
+    app: cronicle
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3012
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: cronicle
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cronicle
+  namespace: cronicle
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: cronicle.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: cronicle
+            port:
+              name: http

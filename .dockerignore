@@ -1,0 +1,70 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Docker files
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# Documentation
+README.md
+*.md
+docs/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependencies (will be installed in container)
+node_modules/
+
+# Testing
+.coverage
+.nyc_output
+coverage/
+*.test.js
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Environment files (contain secrets)
+.env
+.env.local
+.env.*.local
+
+# Backup files
+*.bak
+*.backup
+backup/
+backups/
+
+# Archives
+*.tar
+*.tar.gz
+*.zip
+*.rar
