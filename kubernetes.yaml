@@ -93,9 +93,9 @@ spec:
         app: cronicle
     spec:
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+        runAsUser: 3012
+        runAsGroup: 3012
+        fsGroup: 3012
         seccompProfile:
           type: RuntimeDefault
 
