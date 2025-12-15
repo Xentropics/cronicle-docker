@@ -5,7 +5,7 @@ set -e
 # Builds and pushes multi-architecture Docker images
 
 IMAGE_NAME="xentropics/cronicle"
-VERSION="1.0.0"
+VERSION="1.3.0"
 
 echo "========================================="
 echo "Docker Image Publishing Script"
@@ -26,8 +26,8 @@ echo "Building image for local platform..."
 docker build -t ${IMAGE_NAME}:${VERSION} -t ${IMAGE_NAME}:latest .
 
 echo ""
-echo "Testing image..."
-docker run --rm ${IMAGE_NAME}:latest node --version
+echo "Testing image (checking Node.js installation)..."
+docker run --rm --entrypoint node ${IMAGE_NAME}:latest --version
 
 # Ask if user wants to push
 echo ""
@@ -46,7 +46,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     docker buildx build \
         --platform linux/amd64,linux/arm64 \
         -t ${IMAGE_NAME}:${VERSION} \
-        -t ${IMAGE_NAME}:1.0 \
+        -t ${IMAGE_NAME}:1.2 \
         -t ${IMAGE_NAME}:1 \
         -t ${IMAGE_NAME}:latest \
         --push \
@@ -59,7 +59,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "Tags:"
     echo "  - ${IMAGE_NAME}:latest"
     echo "  - ${IMAGE_NAME}:${VERSION}"
-    echo "  - ${IMAGE_NAME}:1.0"
+    echo "  - ${IMAGE_NAME}:1.2"
     echo "  - ${IMAGE_NAME}:1"
     echo ""
     echo "View at: https://hub.docker.com/r/${IMAGE_NAME}"
