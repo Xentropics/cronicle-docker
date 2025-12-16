@@ -28,7 +28,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
 WORKDIR /tmp/cronicle-build
 RUN git clone https://github.com/jhuckaby/Cronicle.git . && \
     npm install && \
-    npm update glob nodemailer && \
+    npm install nodemailer@7.0.11 && \
     node bin/build.js dist && \
     rm -rf .git && \
     npm cache clean --force
@@ -41,7 +41,7 @@ FROM ubuntu:24.04
 # Metadata
 LABEL maintainer="xentropics"
 LABEL description="Cronicle scheduler - hardened and rootless"
-LABEL version="1.3.0"
+LABEL version="1.3.1"
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -87,6 +87,9 @@ APT::Periodic::Unattended-Upgrade "1";\n' \
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y --no-install-recommends nodejs && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Upgrade Python packages to fix vulnerabilities (setuptools only, pip can't be upgraded via pip itself)
+RUN pip3 install --break-system-packages --upgrade setuptools==78.1.1
 
 # Verify Python venv is available for Cronicle jobs
 RUN python3 -m venv --help > /dev/null && echo "✓ python3-venv installed successfully"
