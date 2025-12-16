@@ -20,8 +20,8 @@ Secure, production-ready Docker container for [Cronicle](https://github.com/jhuc
 
 ## Features
 
-- Ubuntu 22.04 LTS with comprehensive security hardening
-- Rootless execution (UID/GID 1000)
+- Ubuntu 24.04 LTS with comprehensive security hardening
+- Rootless execution (UID/GID 3012)
 - Environment-based configuration
 - Read-only root filesystem support
 - Multi-storage backends (Filesystem, Couchbase, S3)
@@ -78,6 +78,7 @@ kubectl -n cronicle exec deployment/cronicle -- cat /opt/cronicle/data/.admin_cr
 
 # Podman
 podman exec cronicle cat /opt/cronicle/data/.admin_credentials
+```
 
 ## Configuration
 
@@ -122,7 +123,7 @@ make backup      # Backup volumes
 ## Security
 
 **Hardening Principles:**
-- Rootless execution (UID/GID 1000, no shell access)
+- Rootless execution (UID/GID 3012, no shell access)
 - Read-only root filesystem
 - Dropped all Linux capabilities
 - No new privileges flag
@@ -153,7 +154,7 @@ CRONICLE_log_level=9
 
 Fix permissions:
 ```bash
-sudo chown -R 1000:1000 /var/lib/docker/volumes/cronicle-*/_data
+sudo chown -R 3012:3012 /var/lib/docker/volumes/cronicle-*/_data
 ```
 
 ## License
